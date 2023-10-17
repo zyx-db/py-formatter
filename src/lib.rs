@@ -46,6 +46,21 @@ fn fix_assignment(e: Expression) -> Expression {
         before_eq = before_eq.trim();
         after_eq = after_eq.trim();
 
+        // unhandled cases:
+        //
+        // 1) We access at an index
+        // ex: complement = target - nums[i]
+        // current output: complement = target - nums.__setitem__(i, target - nums[i])
+        //
+        // 2) we have a list in the expression
+        // ex: x = [1,2,3]
+        // current output: x = .__setitem__(1, 2, 3,[1, 2, 3]))
+        //
+        // Suggestion: 
+        // It may be better to explicitly check that the assignment is to the object
+        // accessed with [], by iterating backwards through the string when we encounter
+        // a singular '='.
+
         if let (Some(bracket_start), Some(bracket_end)) = (e.rfind('['), e.rfind(']')) {
             format!(
                 "{}.__setitem__({},{})",
