@@ -20,4 +20,5 @@ Python linter to remove unnecessary lines of code.
 - Allow breaking out of for loops, and implement while loops (new g-like function)
 - Allow defining functions (Detect block, combine, and turn into lambda)
 - replace numbers through binary representation using bitwise ops and True/False addition
+- replace n+1 with -~n and n-1 with -~n
 
