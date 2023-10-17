@@ -43,6 +43,10 @@ fn clean_expression(e: Expression) -> Expression {
 
 fn fix_assignment(e: Expression) -> Expression {
     if let Some((mut before_eq, mut after_eq)) = e.split_once('=') {
+        if before_eq.chars().last().unwrap() == ':' || after_eq.chars().next().unwrap() == '='  {
+            return e
+        }
+        
         before_eq = before_eq.trim();
         after_eq = after_eq.trim();
 
@@ -51,17 +55,19 @@ fn fix_assignment(e: Expression) -> Expression {
         // 1) We access at an index
         // ex: complement = target - nums[i]
         // current output: complement = target - nums.__setitem__(i, target - nums[i])
+        // FIXED BY SCANNING BEFORE EQ
         //
         // 2) we have a list in the expression
         // ex: x = [1,2,3]
         // current output: x = .__setitem__(1, 2, 3,[1, 2, 3]))
+        // FIXED BY SCANNING BEFORE EQ
         //
         // Suggestion: 
         // It may be better to explicitly check that the assignment is to the object
         // accessed with [], by iterating backwards through the string when we encounter
         // a singular '='.
 
-        if let (Some(bracket_start), Some(bracket_end)) = (e.rfind('['), e.rfind(']')) {
+        if let (Some(bracket_start), Some(bracket_end)) = (before_eq.rfind('['), before_eq.rfind(']')) {
             format!(
                 "{}.__setitem__({},{})",
                 &e[..bracket_start],
