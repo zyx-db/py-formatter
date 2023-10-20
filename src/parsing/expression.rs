@@ -2,9 +2,9 @@
 pub enum Expression {
     Function(String, String),
     Statement(String),
-    For(String, String),
-    While(String, String),
-    If(String, String),
-    Elif(String, String),
-    Else(String)
+    For(String),
+    While(String),
+    If(String),
+    Elif(String),
+    Else
 }

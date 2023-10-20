@@ -26,24 +26,44 @@ fn leading_spaces(s: &String) -> u16{
     val as u16
 }
 
-// TODO actually return the correct value
+// TODO find the locations of the notable portions of expressions
 // function takes in a line of code, trimmed of whitespace
 // determines the type of expression (which enum variant)
 // constructs the appropriate variant and returns
 fn parse_code(line: &String) -> Option<Expression>{
+    // blank line
+    if line.is_empty(){ return None; } 
+
+    // Note the space at the end of the compared values.
+    // This ensures that this function avoids false positives
     match line {
-        // function
-        s if s.starts_with("def") => {return Some(Expression::Statement(line.clone()));}
-        // for
-        s if s.starts_with("for") => {return Some(Expression::Statement(line.clone()));}
-        // if
-        s if s.starts_with("if") => {return Some(Expression::Statement(line.clone()));}
-        // elif
-        s if s.starts_with("elif") => {return Some(Expression::Statement(line.clone()));}
-        // else
-        s if s.starts_with("else") => {return Some(Expression::Statement(line.clone()));}
-        // while
-        s if s.starts_with("while") => {return Some(Expression::Statement(line.clone()));}
+        s if s.starts_with("def ")=> {
+            let func_name = "";
+            let func_args = "";
+            return Some(Expression::Function(func_name.to_owned(), func_args.to_owned()));
+        }
+        s if s.starts_with("for ") => {
+            let loop_condition = "";
+            return Some(Expression::For(loop_condition.to_owned())); 
+        }
+        s if s.starts_with("if ") => {
+            let condition = "";
+            return Some(Expression::If(condition.to_owned()));
+        }
+        s if s.starts_with("elif ") => {
+            let condition = "";
+            return Some(Expression::Elif(condition.to_owned()));
+        }
+        // in this case the line is simply:
+        // else:
+        // note that there is no space
+        s if s.starts_with("else:") => {
+            return Some(Expression::Else);
+        }
+        s if s.starts_with("while ") => {
+            let condition = "";
+            return Some(Expression::While(condition.to_owned()));
+        }
 
         // comments
         s if s.starts_with("#") => { return None; }

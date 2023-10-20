@@ -1,1 +1,1 @@
-[(0, Statement("def test_function(x):")), (4, Statement("x = 10")), (4, Statement("x = x + 5")), (4, Statement("print(x)"))]
+[(0, Function("", "")), (4, Statement("x = 10")), (4, Statement("x = x + 5")), (4, Statement("print(x)"))]
