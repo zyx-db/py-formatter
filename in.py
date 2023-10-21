@@ -1,4 +1,8 @@
-def test_function(x):
+def test():
     x = 10
-    x = x + 5
-    print(x)
+    if x > 10:
+        return 'hi'
+    elif x > 8:
+        return 'hi2'
+    else:
+        return '?'
