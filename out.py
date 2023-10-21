@@ -1,2 +1,2 @@
-def test(g=lambda x:next(filter(lambda x:x is not None,x),None),n=lambda x:None):
-	return g([n(x:=10),[lambda:[lambda:'?',lambda:'hi2'][x > 8](),lambda:'hi'][x > 10]()])
+def integerBreak(self, n: int,__=lambda x:next(filter(lambda x:x is not None,x),None),_=lambda x:None) -> int:
+	return __([[lambda:None,lambda:1][n == 2](),[lambda:None,lambda:2][n == 3](),_(r:=n % 3),(r*(-5*r+11)+2) * (3 ** ((n+r*(3*r-7))//3))//2])

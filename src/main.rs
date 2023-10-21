@@ -3,7 +3,10 @@ use std::{
     io::{BufRead, BufReader, Write},
 };
 
+mod conditions;
 mod formatter;
+mod utils;
+
 use formatter::Formatter;
 
 fn main() {
