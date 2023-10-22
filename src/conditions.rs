@@ -49,6 +49,6 @@ fn clauses_to_str(if_clauses: Vec<(String, String)>, else_clause: String) -> Str
         .iter()
         .rev()
         .fold(else_clause, |prev, (condition, block)| {
-            format!("[lambda:{},lambda:{}][{}]()", prev, block, condition)
+            format!("{} if {} else {}", block, condition, prev)
         })
 }

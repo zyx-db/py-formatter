@@ -1,7 +1,20 @@
-def integerBreak(self, n: int) -> int:
-    if n == 2:
-        return 1
-    if n == 3:
-        return 2
-    r = n % 3        
-    return (r*(-5*r+11)+2) * (3 ** ((n+r*(3*r-7))//3))//2
+def lengthOfLongestSubstring(self, s: str) -> int:
+    sol = 0
+    for num in range(len(s)):
+        i = num
+        used = []
+        count = 0
+        for _ in iter(int, 1):
+            if s[i] in used:
+                break
+            elif i == len(s) - 1:
+                count = count + 1
+                break
+            else:
+                used.append(s[i])
+                count = count + 1
+                i = i + 1
+        
+        sol = max(sol, count)
+    
+    return sol

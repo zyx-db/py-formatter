@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use crate::utils::{
     clean_expression, fix_function_def, group_expressions, is_block_start, leading_spaces,
@@ -7,25 +7,39 @@ use crate::utils::{
 pub struct Formatter {
     pub lines: Vec<String>,
     pub block_ends: HashMap<usize, usize>,
+    pub loop_depths: Vec<usize>,
 }
 
 impl Formatter {
     pub fn new(mut lines: Vec<String>) -> Self {
         lines.push("".to_owned());
+        let n = lines.len();
         Self {
             lines,
             block_ends: HashMap::new(),
+            loop_depths: vec![0; n],
         }
     }
 
-    pub fn compute_blocks(&mut self) {
+    pub fn compute_blocks_and_depth(&mut self) {
         let mut stack = Vec::new();
+        let mut loop_depth = 0;
+        let mut loop_starts = HashSet::new();
 
         for (i, line) in self.lines.iter().enumerate() {
-            let curr_depth = leading_spaces(line);
+            if line.trim().starts_with("for") || line.trim().starts_with("while") {
+                loop_depth += 1;
+                loop_starts.insert(i);
+            }
+            self.loop_depths[i] = loop_depth;
+
+            let tab_depth = leading_spaces(line);
             while let Some((depth, idx)) = stack.last() {
-                if *depth >= curr_depth {
+                if *depth >= tab_depth {
                     self.block_ends.insert(*idx, i);
+                    if loop_starts.contains(idx) {
+                        loop_depth -= 1;
+                    }
                     stack.pop();
                 } else {
                     break;
@@ -33,7 +47,7 @@ impl Formatter {
             }
 
             if is_block_start(line) {
-                stack.push((curr_depth, i));
+                stack.push((tab_depth, i));
             }
         }
 
@@ -64,12 +78,28 @@ impl Formatter {
             if self.lines[i].starts_with("if") {
                 (i, expression) = self.compress_condition(i);
                 expressions.push(expression);
-            } else {
+            } else if self.lines[i].starts_with("for") {
+                let mut for_expression = self.lines[i].clone();
+                for_expression.pop();
+                let block_end = self.block_ends[&i];
+                let for_group = format!(
+                    "group({},({} {}))",
+                    self.loop_depths[i],
+                    self.compress(i + 1, block_end),
+                    for_expression
+                );
+                expressions.push(for_group);
+                i = block_end;
+            } else if self.lines[i] == "break" {
+                expressions.push(format!("(..., {})", self.loop_depths[i]));
+                i += 1;
+            } 
+            else {
                 expressions.push(clean_expression(self.lines[i].clone()));
                 i += 1;
             }
         }
 
-        group_expressions(expressions)
+        group_expressions(self.loop_depths[start], expressions)
     }
 }

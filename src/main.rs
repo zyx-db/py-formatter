@@ -20,7 +20,7 @@ fn main() {
         .collect();
 
     let mut formatter = Formatter::new(lines);
-    formatter.compute_blocks();
+    formatter.compute_blocks_and_depth();
 
     let mut output = File::create("out.py").unwrap();
     write!(output, "{}", formatter.one_line_function()).unwrap();
