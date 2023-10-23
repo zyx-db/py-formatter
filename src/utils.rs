@@ -7,14 +7,6 @@ pub fn group_expressions(loop_depth: usize, expressions: Vec<String>) -> String 
     format!("group({},[{}])", loop_depth, expression_list)
 }
 
-pub fn clean_expression(e: String) -> String {
-    if e.starts_with("return") {
-        e[6..].trim().to_owned()
-    } else {
-        format!("none({})", fix_assignment(e.to_owned()))
-    }
-}
-
 pub fn fix_assignment(e: String) -> String {
     if let Some((mut before_eq, mut after_eq)) = e.split_once('=') {
         if before_eq.chars().last().unwrap() == ':' || after_eq.chars().next().unwrap() == '=' {
@@ -54,25 +46,21 @@ pub fn leading_spaces(s: &String) -> usize {
 }
 
 pub fn fix_function_def(function_def: String) -> String {
-    let g_def = "group=lambda depth, iterable:next(filter(lambda x:x is not None and not(type(x) == tuple and len(x) == 2 and x[0] == ... and type(x[1]) == int and x[1] > depth), iterable), None)";
-    let n_def = "none=lambda x:None";
-
+    let g_def = "group=lambda depth,iterable:next(filter(lambda x:type(x)==tuple and len(x)==2 and (x[0]==... and x[1]<=depth or x[0]==()),iterable),(...,float('inf')))";
     let closing_idx = function_def.rfind(')').unwrap();
 
     if function_def.chars().nth(closing_idx - 1).unwrap() == '(' {
         format!(
-            "{}{},{}{}",
+            "{}{}{}",
             &function_def[..closing_idx],
             g_def,
-            n_def,
             &function_def[closing_idx..]
         )
     } else {
         format!(
-            "{},{},{}{}",
+            "{},{}{}",
             &function_def[..closing_idx],
             g_def,
-            n_def,
             &function_def[closing_idx..]
         )
     }

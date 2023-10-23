@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::utils::{
-    clean_expression, fix_function_def, group_expressions, is_block_start, leading_spaces,
+    fix_assignment, fix_function_def, group_expressions, is_block_start, leading_spaces,
 };
 
 pub struct Formatter {
@@ -60,7 +60,7 @@ impl Formatter {
 
     pub fn one_line_function(&self) -> String {
         format!(
-            "{}\n\treturn {}",
+            "{}\n\treturn {}[1]",
             fix_function_def(self.lines[0].clone()),
             self.compress(1, self.lines.len())
         )
@@ -90,16 +90,23 @@ impl Formatter {
                 );
                 expressions.push(for_group);
                 i = block_end;
-            } else if self.lines[i] == "break" {
-                expressions.push(format!("(..., {})", self.loop_depths[i]));
-                i += 1;
-            } 
-            else {
-                expressions.push(clean_expression(self.lines[i].clone()));
+            } else {
+                expressions.push(self.clean_expression(i));
                 i += 1;
             }
         }
 
         group_expressions(self.loop_depths[start], expressions)
+    }
+
+    fn clean_expression(&self, i: usize) -> String {
+        let e = self.lines[i].clone();
+        if e.starts_with("return") {
+            format!("((),{})", e[6..].trim())
+        } else if e == "break" {
+            format!("(...,{})", self.loop_depths[i])
+        } else {
+            fix_assignment(e)
+        }
     }
 }
