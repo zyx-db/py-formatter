@@ -1,20 +1,19 @@
-def lengthOfLongestSubstring(self, s: str) -> int:
-    sol = 0
-    for num in range(len(s)):
-        i = num
-        used = []
-        count = 0
-        for _ in iter(int, 1):
-            if s[i] in used:
-                break
-            elif i == len(s) - 1:
-                count = count + 1
-                break
+def threeSum(self, nums: List[int]) -> List[List[int]]:
+    n = len(nums)
+    nums.sort()
+    sol = set()
+
+    for i in range(n-2):
+        j = i+1
+        k = n-1
+        while j < k:
+            if nums[i] + nums[j] + nums[k] < 0:
+                j += 1
+            elif nums[i] + nums[j] + nums[k] > 0:
+                k -= 1
             else:
-                used.append(s[i])
-                count = count + 1
-                i = i + 1
-        
-        sol = max(sol, count)
+                sol.add((nums[i], nums[j], nums[k]))
+                j += 1
+                k -= 1
     
-    return sol
+    return list(sol)

@@ -90,6 +90,18 @@ impl Formatter {
                 );
                 expressions.push(for_group);
                 i = block_end;
+            } else if self.lines[i].starts_with("while") {
+                let len = self.lines[i].len();
+                let block_end = self.block_ends[&i];
+                let while_condition = &self.lines[i][5..len-1];
+                let while_group = format!(
+                    "group({0},((...,{0}) if not({1}) else {2} for _ in iter(int, 1)))",
+                    self.loop_depths[i],
+                    while_condition,
+                    self.compress(i+1, block_end),
+                );
+                expressions.push(while_group);
+                i = block_end;
             } else {
                 expressions.push(self.clean_expression(i));
                 i += 1;

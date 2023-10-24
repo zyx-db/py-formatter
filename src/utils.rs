@@ -8,13 +8,22 @@ pub fn group_expressions(loop_depth: usize, expressions: Vec<String>) -> String 
 }
 
 pub fn fix_assignment(e: String) -> String {
-    if let Some((mut before_eq, mut after_eq)) = e.split_once('=') {
+    if let Some((before_eq, after_eq)) = e.split_once('=') {
+        let mut before_eq = before_eq.to_owned();
+        let mut after_eq = after_eq.to_owned();
         if before_eq.chars().last().unwrap() == ':' || after_eq.chars().next().unwrap() == '=' {
             return e;
         }
 
-        before_eq = before_eq.trim();
-        after_eq = after_eq.trim();
+        for operator in ["+", "-", "*", "/", "%", "//", "<<", ">>"] {
+            if before_eq.ends_with(operator) {
+                before_eq = before_eq[..before_eq.len()-operator.len()].trim().to_string();
+                after_eq = format!("{}{}{}", before_eq, operator, after_eq.trim());
+            }
+        }
+
+        let before_eq = before_eq.trim();
+        let after_eq = after_eq.trim();
 
         if let (Some(bracket_start), Some(bracket_end)) =
             (before_eq.rfind('['), before_eq.rfind(']'))
@@ -26,7 +35,7 @@ pub fn fix_assignment(e: String) -> String {
                 after_eq
             )
         } else {
-            format!("{}:={}", before_eq, after_eq)
+            format!("({}:={})", before_eq, after_eq)
         }
     } else {
         e
